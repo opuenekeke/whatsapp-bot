@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 # --- WhatsApp API Credentials ---
 VERIFY_TOKEN = "litewaybot"  # same verify token used on Facebook
-ACCESS_TOKEN = "EAAP8aDUKLqMBPiV0w5dFJLXkawqL3OSZAT3Wjp6zipgHSuRUmUjaDtZCvT7ovuLQrXehrqo7jkInhxldwXX869zkCMSn8ws3J5IieENEcxJW0bTf1BK2nOtWj7AdrlHIlIjc2U3lHVxOqEDvw2xTpBt9uokqKqOgE9wZBQZCOMZB8xVUAaq1UbljPtqrgOwZDZD"
+ACCESS_TOKEN = "EAAP8aDUKLqMBPoiEWErjRXq6w93i8w6XYxSblqDNEB9h3unhZCYBeq8ZAtBqZCnWEyfinRjis5OXchs1567dbPEKpOHHIestC84H1aTftLE2WXLC0BklmyQuGAiNBbkxZACyRW01lctxFR9NWo4OTlFyXKHt7K9aEybkSAwEejDH2BqdU9TcDZAYsvPNKBgZDZD"
 
 @app.route('/', methods=['GET'])
 def home():
