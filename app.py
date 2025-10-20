@@ -8,6 +8,9 @@ app = Flask(__name__)
 VERIFY_TOKEN = "litewaybot"  # same verify token used on Facebook
 ACCESS_TOKEN = "EAAV8xZCoaLukBPqIg6XNacZA7nsjaBX2arJ1votPolGPtKBvP6unirusvvRxYFTyLvDKdJ5AlEYAjNSrz58H34JS2MZA0ReLim0ZACVlxUKQyPZAIML5vQqnWARced0BYdeqWXjzMrvQkFZBmSYilsGz6ZA66Jx3NbZAUlUKu3EUrKDyxpj0wYa57hbZCnEGZCvrZAETZA2cCP7Mc2UdbZBW46NQxcoZAmUZCkMsDVriCZCJHXhQL5kZD"
 
+PHONE_NUMBER_ID = "823077057555789"  # your WhatsApp phone number ID
+
+
 @app.route('/', methods=['GET'])
 def home():
     return "WhatsApp Bot is live!", 200
@@ -43,21 +46,12 @@ def handle_message():
             contact_info = data["entry"][0]["changes"][0]["value"].get("contacts", [])
             name = contact_info[0]["profile"]["name"] if contact_info else "there"
 
-            # --- Smart reply section ---
+            # --- Reply with interactive buttons ---
             if text in ["hi", "hello", "hey"]:
-                reply = (
-                    f"👋 Hello *{name}!* \n\n"
-                    "What would you like to do today?\n"
-                    "1️⃣ Buy Data\n"
-                    "2️⃣ Buy Airtime\n"
-                    "3️⃣ Pay Bills\n"
-                    "\nPlease reply with the number of your choice."
-                )
+                reply_with_buttons(sender, name)
             else:
-                reply = f"You said: {text}"
-
-            # Send message
-            send_message(sender, reply)
+                reply_text = f"You said: {text}"
+                send_message(sender, reply_text)
 
     except Exception as e:
         print("Error:", e)
@@ -65,9 +59,9 @@ def handle_message():
     return jsonify(success=True), 200
 
 
-# --- Function to send message back to user ---
+# --- Function to send normal text messages ---
 def send_message(to, message):
-    url = "https://graph.facebook.com/v22.0/823077057555789/messages"
+    url = f"https://graph.facebook.com/v22.0/{PHONE_NUMBER_ID}/messages"
     headers = {
         "Authorization": f"Bearer {ACCESS_TOKEN}",
         "Content-Type": "application/json"
@@ -79,7 +73,38 @@ def send_message(to, message):
         "text": {"body": message}
     }
     response = requests.post(url, headers=headers, json=payload)
-    print("Response:", response.text)
+    print("Text Response:", response.text)
+
+
+# --- Function to send interactive buttons ---
+def reply_with_buttons(to, name):
+    url = f"https://graph.facebook.com/v22.0/{PHONE_NUMBER_ID}/messages"
+    headers = {
+        "Authorization": f"Bearer {ACCESS_TOKEN}",
+        "Content-Type": "application/json"
+    }
+
+    payload = {
+        "messaging_product": "whatsapp",
+        "to": to,
+        "type": "interactive",
+        "interactive": {
+            "type": "button",
+            "body": {
+                "text": f"👋 Hello *{name}!* \nWhat would you like to do today?"
+            },
+            "action": {
+                "buttons": [
+                    {"type": "reply", "reply": {"id": "buy_data", "title": "Buy Data"}},
+                    {"type": "reply", "reply": {"id": "buy_airtime", "title": "Buy Airtime"}},
+                    {"type": "reply", "reply": {"id": "pay_bills", "title": "Pay Bills"}}
+                ]
+            }
+        }
+    }
+
+    response = requests.post(url, headers=headers, json=payload)
+    print("Button Response:", response.text)
 
 
 # --- Run the Flask app ---
