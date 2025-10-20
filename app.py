@@ -37,10 +37,26 @@ def handle_message():
         if "messages" in data["entry"][0]["changes"][0]["value"]:
             message = data["entry"][0]["changes"][0]["value"]["messages"][0]
             sender = message["from"]
-            text = message.get("text", {}).get("body", "")
+            text = message.get("text", {}).get("body", "").strip().lower()
 
-            # --- Send a reply ---
-            reply = f"You said: {text}"
+            # Get user's WhatsApp name
+            contact_info = data["entry"][0]["changes"][0]["value"].get("contacts", [])
+            name = contact_info[0]["profile"]["name"] if contact_info else "there"
+
+            # --- Smart reply section ---
+            if text in ["hi", "hello", "hey"]:
+                reply = (
+                    f"👋 Hello *{name}!* \n\n"
+                    "What would you like to do today?\n"
+                    "1️⃣ Buy Data\n"
+                    "2️⃣ Buy Airtime\n"
+                    "3️⃣ Pay Bills\n"
+                    "\nPlease reply with the number of your choice."
+                )
+            else:
+                reply = f"You said: {text}"
+
+            # Send message
             send_message(sender, reply)
 
     except Exception as e:
